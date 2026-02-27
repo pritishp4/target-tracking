@@ -67,8 +67,8 @@ def parse_args():
 
     parser.add_argument(
         "--yolo-model",
-        default="./yolo/yolo26x.pt",
-        help="YOLO model path (default: ./yolo/yolo26x.pt)"
+        default="./models/yolo26x.pt",
+        help="YOLO model path (default: ./models/yolo26x.pt)"
     )
 
     parser.add_argument(
