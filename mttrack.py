@@ -5,6 +5,9 @@ Multi-Target Tracking with VL Classification.
 Usage:
     python mttrack.py --input ./data/test_multi_target_tracker_video.mp4 --output ./out/result.mp4
 
+Enhanced Mode:
+    python mttrack.py --input ./data/test_multi_target_tracker_video.mp4 --output ./out/result.mp4 --enhanced
+
 Environment variables:
     VLLM_BASE_URL: VLLM API base URL
     VLLM_API_KEY: VLLM API key
@@ -28,6 +31,13 @@ from mttrack.infrastructure import (
 )
 from mttrack.service import TrackerService, LabelService
 from mttrack.annotators import TrackingAnnotator
+
+# Import enhanced service
+try:
+    from mttrack.service import EnhancedTrackerService
+    ENHANCED_AVAILABLE = True
+except ImportError:
+    ENHANCED_AVAILABLE = False
 
 
 def parse_args():
@@ -101,6 +111,35 @@ def parse_args():
         help="Show FPS on output video"
     )
 
+    # Enhanced mode arguments
+    parser.add_argument(
+        "--enhanced",
+        action="store_true",
+        default=False,
+        help="Enable enhanced mode with appearance features and adaptive VL triggering"
+    )
+
+    parser.add_argument(
+        "--no-appearance",
+        action="store_true",
+        default=False,
+        help="Disable appearance feature extraction (enhanced mode)"
+    )
+
+    parser.add_argument(
+        "--vl-min-interval",
+        type=int,
+        default=30,
+        help="Minimum frames between VL classifications (enhanced mode, default: 30)"
+    )
+
+    parser.add_argument(
+        "--vl-max-interval",
+        type=int,
+        default=150,
+        help="Maximum frames between VL classifications (enhanced mode, default: 150)"
+    )
+
     return parser.parse_args()
 
 
@@ -158,6 +197,11 @@ def main():
     """Main entry point."""
     args = parse_args()
 
+    # Check enhanced mode availability
+    if args.enhanced and not ENHANCED_AVAILABLE:
+        print("[Warning] Enhanced mode requested but not available, falling back to standard mode")
+        args.enhanced = False
+
     # Resolve paths
     input_path = Path(args.input).resolve()
     output_path = Path(args.output).resolve()
@@ -173,6 +217,7 @@ def main():
     print(f"[Info] Output: {output_path}")
     print(f"[Info] Tracker: {args.tracker}")
     print(f"[Info] YOLO model: {args.yolo_model}")
+    print(f"[Info] Mode: {'Enhanced' if args.enhanced else 'Standard'}")
 
     # Initialize detector
     print("[Info] Loading YOLO model...")
@@ -195,11 +240,23 @@ def main():
     else:
         print("[Info] VL classification disabled by user")
 
-    # Initialize tracker service
-    tracker_service = TrackerService(
-        detector=detector,
-        tracker_type=args.tracker,
-    )
+    # Initialize tracker service (standard or enhanced)
+    if args.enhanced:
+        print("[Info] Initializing Enhanced Tracker Service...")
+        tracker_service = EnhancedTrackerService(
+            detector=detector,
+            tracker_type=args.tracker,
+            tracker_kwargs={},
+            enable_appearance=not args.no_appearance,
+            enable_adaptive_vl=args.enable_vl and vllm_client is not None,
+            vl_min_interval=args.vl_min_interval,
+            vl_max_interval=args.vl_max_interval,
+        )
+    else:
+        tracker_service = TrackerService(
+            detector=detector,
+            tracker_type=args.tracker,
+        )
 
     # Initialize label service
     label_service = LabelService(
@@ -247,8 +304,20 @@ def main():
                 # Label tracks with VL model
                 if label_service.enabled and vllm_client:
                     for track in frame_tracks.tracks:
-                        # Check if should label
-                        if label_service.should_label(track.track_id, frame_id):
+                        # Enhanced mode: use adaptive triggering
+                        should_label = True
+                        reason = "interval"
+
+                        if args.enhanced and args.enable_vl:
+                            # Use adaptive VL trigger in enhanced mode
+                            should_label, reason = tracker_service.should_classify_vl(
+                                track.track_id,
+                                track.bbox,
+                                track.label_confidence if track.label_confidence > 0 else track.confidence
+                            )
+
+                        # Check if should label (either adaptive or interval-based)
+                        if should_label and label_service.should_label(track.track_id, frame_id):
                             # Crop image
                             crop = crop_track(frame, track.bbox)
                             if crop is not None and crop.size > 0:

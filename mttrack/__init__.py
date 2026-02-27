@@ -35,6 +35,7 @@ from mttrack.service import (
     FrameTracks,
     LabelService,
     LabelCache,
+    EnhancedTrackerService,
 )
 
 from mttrack.annotators import (
@@ -43,7 +44,7 @@ from mttrack.annotators import (
     draw_track_id_only,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     # Domain
